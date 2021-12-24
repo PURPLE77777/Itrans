@@ -1,0 +1,23 @@
+{
+  "name": "itrans",
+  "version": "1.0.0",
+  "main": "task2.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PURPLE77777/Itrans.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PURPLE77777/Itrans/issues"
+  },
+  "homepage": "https://github.com/PURPLE77777/Itrans#readme",
+  "description": "",
+  "dependencies": {
+    "js-sha3": "^0.8.0",
+    "node-stream-zip": "^1.15.0"
+  }
+}
