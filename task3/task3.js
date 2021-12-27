@@ -85,7 +85,6 @@ class Computer {
             max: this.computerMoves.length - 1,
             integer: true,
         });
-        console.log(randIndex);
         let key = secureRandom.randomBuffer(32).toString("hex");
         this.currentKey = key;
         this.currentMove = this.computerMoves[randIndex];
