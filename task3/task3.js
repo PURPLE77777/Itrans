@@ -1,6 +1,7 @@
 const secureRandom = require("secure-random");
 const crypto = require("crypto");
 const readlineSync = require("readline-sync");
+const randomNumber = require("random-number");
 class Game {
     constructor(moves) {
         this.moves = moves;
@@ -79,8 +80,12 @@ class Computer {
         this.currentKey;
     }
     randomMove() {
-        let randIndex =
-            Math.round(Math.random() * this.computerMoves.length) - 1;
+        let randIndex = randomNumber({
+            min: 0,
+            max: this.computerMoves.length - 1,
+            integer: true,
+        });
+        console.log(randIndex);
         let key = secureRandom.randomBuffer(32).toString("hex");
         this.currentKey = key;
         this.currentMove = this.computerMoves[randIndex];
