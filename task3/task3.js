@@ -1,5 +1,6 @@
 const secureRandom = require("secure-random");
 const crypto = require("crypto");
+const readlineSync = require("readline-sync");
 class Game {
     constructor(moves) {
         this.moves = moves;
@@ -9,7 +10,7 @@ class Game {
     }
     start() {
         this.computer.randomMove();
-        console.log(`Available moves:\n`);
+        this.player.playerMove();
     }
     check(str1, str2) {
         let sub = this.moves.slice(0);
@@ -22,27 +23,54 @@ class Game {
     }
     winner() {
         let result = this.check(
-            this.player.currectmove,
-            this.computer.currectmove
+            this.player.currentMove,
+            this.computer.currentMove
         );
+        console.log(`Computer move: ${this.computer.currentMove}`);
         if (result == "win") {
-            console.log("Congratulations! You won! :)");
+            console.log(
+                `Congratulations! You won! :)\nHMAC key:\n${this.computer.currentKey}\n`
+            );
         } else if (result == "lose") {
-            console.log("Oh, you lose :(");
-        } else {
-            console.log("It's a draw :|");
+            console.log(
+                `Oh, you lose :(\nHMAC key:\n${this.computer.currentKey}\n`
+            );
+        } else if (result == "draw") {
+            console.log(
+                `It's a draw :|\nHMAC key:\n${this.computer.currentKey}\n`
+            );
         }
+        this.start();
     }
 }
-
 class Player {
     constructor(moves) {
         this.playerMoves = moves;
         this.currentMove;
     }
-    playerMove() {}
+    playerMove() {
+        let menu = "";
+        for (let i = 0; i < this.playerMoves.length; i++) {
+            menu += `${i + 1} - ${this.playerMoves[i]}\n`;
+        }
+        menu += "0 - exit\n? - help";
+        console.log(menu);
+        let move = readlineSync.question("Select an action: ");
+        if (move == "0") console.log("Your move: exit\nBye-bye");
+        else if (move == "?") {
+            console.log(`Your move: help`);
+            app.helper.showTable();
+            this.playerMove();
+        } else if (Number(move) <= this.playerMoves.length) {
+            this.currentMove = this.playerMoves[Number(move) - 1];
+            console.log(`Your move: ${this.currentMove}`);
+            app.winner();
+        } else {
+            console.log(`Yout move: ${move}\nPlease, enter a correct move!`);
+            this.playerMove();
+        }
+    }
 }
-
 class Computer {
     constructor(moves) {
         this.computerMoves = moves;
@@ -51,7 +79,8 @@ class Computer {
         this.currentKey;
     }
     randomMove() {
-        let randIndex = (Math.random() * this.computerMoves.length).round() - 1;
+        let randIndex =
+            Math.round(Math.random() * this.computerMoves.length) - 1;
         let key = secureRandom.randomBuffer(32).toString("hex");
         this.currentKey = key;
         this.currentMove = this.computerMoves[randIndex];
@@ -63,7 +92,6 @@ class Computer {
         console.log(`HMAC:\n${HMAC}`);
     }
 }
-
 class HelpTable {
     constructor(moves) {
         this.moves = moves;
@@ -72,7 +100,7 @@ class HelpTable {
         let table = [];
         for (let x = 0; x < this.moves.length + 1; x++) {
             table[x] = [];
-            table[0][0] = "№ move";
+            table[0][0] = `move \u2193`;
             for (let y = 0; y < this.moves.length + 1; y++) {
                 if (y != 0 && x == 0) table[x][y] = this.moves[y - 1];
                 else if (x != 0 && y == 0) table[x][y] = this.moves[x - 1];
@@ -82,8 +110,6 @@ class HelpTable {
             }
         }
         this.table = table;
-    }
-    showTable() {
         let str = "";
         for (let y = 0; y == 0; y++) {
             for (let x = 0; x < this.table.length; x++) {
@@ -102,14 +128,13 @@ class HelpTable {
             }
             consoleTable += `\n${hor}\n`;
         }
-        console.log(consoleTable);
+        this.consoleTable = consoleTable;
+    }
+    showTable() {
+        console.log(this.consoleTable);
     }
 }
-
-let steps = ["paper", "stone", "knees", "rock", "lizard"]
-    .join(",")
-    .toLowerCase()
-    .split(","); // вместо массива наддо поменять на process.argv.slice(2) !!!
+let steps = process.argv.slice(2).join(",").toLowerCase().split(",");
 steps = Array.from(new Set(steps));
 let app;
 if (steps.length < 3) {
@@ -123,9 +148,5 @@ if (steps.length < 3) {
 } else {
     app = new Game(steps);
     app.helper.makeTable();
+    app.start();
 }
-
-//["paper", "stone", "knees", "rock", "lizard"]
-//["a","b","c","d","d","e","f","c"]
-// a b c d d e f c
-//paper stone knees rock lizard stone knees
